@@ -8,6 +8,8 @@
   <title>Reservation System</title>
   <!-- Bootstrap CSS (optional) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <!-- After Bootstrap JS -->
+<script src="../resources/js/script.js"></script>
   <!-- Your custom CSS -->
   <link rel="stylesheet" href="../resources/css/style.css">
 </head>

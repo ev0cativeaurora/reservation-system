@@ -1,12 +1,124 @@
 /* style.css */
 
-body {
-    background-color: #f8f9fa;
+/* 
+  1. Root Variables:
+     - Makes it easy to change theme colors & spacing in one place.
+*/
+:root {
+    --primary-color: #4CAF50;      /* A green shade */
+    --secondary-color: #303030;    /* Dark gray for contrast */
+    --light-color: #fff;
+    --dark-color: #222;
+    --transition-speed: 0.3s;
   }
   
-  h1, h2 {
-    color: #333;
+  /* 
+    2. Basic Global Resets & Typography
+  */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
   
-  /* Add your custom CSS rules here */
+  html, body {
+    font-family: 'Open Sans', sans-serif;
+    background: linear-gradient(120deg, #e0f7fa, #fff);
+    color: var(--dark-color);
+    transition: background-color var(--transition-speed) ease-in-out,
+                color var(--transition-speed) ease-in-out;
+  }
+  
+  /* 
+    3. Responsive Container Spacing
+  */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  /* 
+    4. Navbar Styling (overrides or extends Bootstrap)
+  */
+  .navbar {
+    background-color: var(--primary-color) !important;
+    transition: background-color var(--transition-speed);
+  }
+  .navbar-brand {
+    color: var(--light-color) !important;
+    font-weight: bold;
+  }
+  .nav-link {
+    color: var(--light-color) !important;
+  }
+  .nav-link:hover {
+    color: var(--secondary-color) !important;
+    background-color: var(--light-color) !important;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  
+  /* 
+    5. Cool Button Styles (Bootstrap extension)
+  */
+  .btn-cool {
+    background-color: var(--primary-color);
+    color: var(--light-color);
+    border: none;
+    transition: transform var(--transition-speed), background-color var(--transition-speed);
+  }
+  .btn-cool:hover {
+    background-color: #43a047; /* a slightly darker green */
+    transform: scale(1.05);
+  }
+  
+  /* 
+    6. Card / Panel Styles
+  */
+  .custom-card {
+    background-color: var(--light-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    padding: 1.5rem;
+    transition: box-shadow var(--transition-speed);
+  }
+  .custom-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+  
+  /* 
+    7. Dark Mode Class
+       - We'll use JavaScript to toggle this on/off
+  */
+  .dark-mode {
+    background-color: var(--secondary-color) !important;
+    color: var(--light-color) !important;
+  }
+  .dark-mode .navbar {
+    background-color: var(--dark-color) !important;
+  }
+  .dark-mode .navbar-brand, 
+  .dark-mode .nav-link {
+    color: var(--light-color) !important;
+  }
+  .dark-mode .btn-cool {
+    background-color: #666;
+  }
+  .dark-mode .custom-card {
+    background-color: #444;
+    color: var(--light-color) !important;
+  }
+  
+  /* 
+    8. Responsive Media Query Example
+       - Stacks elements on smaller screens
+  */
+  @media (max-width: 768px) {
+    .navbar .navbar-brand {
+      font-size: 1.2rem;
+    }
+    .custom-card {
+      margin-bottom: 1rem;
+    }
+  }
   
