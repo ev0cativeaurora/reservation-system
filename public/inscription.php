@@ -1,13 +1,18 @@
 <?php
-// inscription.php
+// inscription.php with vertical layout
+require_once '../config/config.php';  
+require_once '../utils/functions.php'; 
+require_once '../includes/csrf.php';   
 
-require_once '../config/config.php';  // DB connection via PDO
-require_once '../utils/functions.php'; // e.g. sanitizeInput(), isValidEmail()
-require_once '../includes/csrf.php';   // CSRF token generation/validation
-
-// Start the session if not already started (important for CSRF)
+// Start the session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+
+// If user is already logged in, redirect to profile
+if (isset($_SESSION['user_id'])) {
+    header("Location: profil.php");
+    exit;
 }
 
 // Handle form submission
@@ -30,10 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Basic validations
         if (empty($prenom) || empty($nom) || empty($email) || empty($motDePasse)) {
-            $errors[] = "Please fill in all required fields.";
+            $errors[] = "Veuillez remplir tous les champs obligatoires.";
         }
         if (!isValidEmail($email)) {
-            $errors[] = "Invalid email format.";
+            $errors[] = "Format d'email invalide.";
         }
 
         // If no errors so far, check if email already exists
@@ -46,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $count = $stmt->fetchColumn();
 
                 if ($count > 0) {
-                    $errors[] = "Email is already in use.";
+                    $errors[] = "Cet email est déjà utilisé.";
                 } else {
                     // If email is unique, insert user
                     $hashedPassword = password_hash($motDePasse, PASSWORD_DEFAULT);
@@ -68,10 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $insertStmt->bindValue(':password', $hashedPassword);
                     $insertStmt->execute();
 
-                    $successMessage = "Registration successful! You can now log in.";
+                    $successMessage = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
                 }
             } catch (PDOException $e) {
-                $errors[] = "Database error: " . $e->getMessage();
+                $errors[] = "Erreur de base de données: " . $e->getMessage();
             }
         }
     }
@@ -80,57 +85,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once '../includes/header.php';
 ?>
 
-<h2>Inscription</h2>
+<div class="auth-container">
+    <h2 class="text-center mb-4">Inscription</h2>
 
-<?php if (!empty($errors)) : ?>
-  <div class="alert alert-danger">
-    <ul>
-      <?php foreach ($errors as $error) : ?>
-        <li><?php echo $error; ?></li>
-      <?php endforeach; ?>
-    </ul>
-  </div>
-<?php endif; ?>
+    <?php if (!empty($errors)) : ?>
+      <div class="alert alert-danger">
+        <ul>
+          <?php foreach ($errors as $error) : ?>
+            <li><?php echo $error; ?></li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+    <?php endif; ?>
 
-<?php if ($successMessage) : ?>
-  <div class="alert alert-success">
-    <?php echo $successMessage; ?>
-  </div>
-<?php else : ?>
-  <form action="" method="POST">
-    <?php // Generate and embed CSRF token ?>
-    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+    <?php if ($successMessage) : ?>
+      <div class="alert alert-success">
+        <?php echo $successMessage; ?>
+        <div class="text-center mt-3">
+            <a href="connexion.php" class="btn btn-primary">Se connecter</a>
+        </div>
+      </div>
+    <?php else : ?>
+      <form action="" method="POST">
+        <?php // Generate and embed CSRF token ?>
+        <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
 
-    <div class="mb-3">
-      <label for="prenom" class="form-label">First Name:</label>
-      <input type="text" class="form-control" id="prenom" name="prenom" required>
-    </div>
-    <div class="mb-3">
-      <label for="nom" class="form-label">Last Name:</label>
-      <input type="text" class="form-control" id="nom" name="nom" required>
-    </div>
-    <div class="mb-3">
-      <label for="date_naissance" class="form-label">Date of Birth:</label>
-      <input type="date" class="form-control" id="date_naissance" name="date_naissance">
-    </div>
-    <div class="mb-3">
-      <label for="adresse" class="form-label">Address:</label>
-      <input type="text" class="form-control" id="adresse" name="adresse">
-    </div>
-    <div class="mb-3">
-      <label for="telephone" class="form-label">Phone:</label>
-      <input type="text" class="form-control" id="telephone" name="telephone">
-    </div>
-    <div class="mb-3">
-      <label for="email" class="form-label">Email:</label>
-      <input type="email" class="form-control" id="email" name="email" required>
-    </div>
-    <div class="mb-3">
-      <label for="mot_de_passe" class="form-label">Password:</label>
-      <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Register</button>
-  </form>
-<?php endif; ?>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="prenom" class="form-label">Prénom *</label>
+                  <input type="text" class="form-control" id="prenom" name="prenom" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="nom" class="form-label">Nom *</label>
+                  <input type="text" class="form-control" id="nom" name="nom" required>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="date_naissance" class="form-label">Date de naissance</label>
+          <input type="date" class="form-control" id="date_naissance" name="date_naissance">
+        </div>
+        
+        <div class="mb-3">
+          <label for="adresse" class="form-label">Adresse</label>
+          <input type="text" class="form-control" id="adresse" name="adresse">
+        </div>
+        
+        <div class="mb-3">
+          <label for="telephone" class="form-label">Téléphone</label>
+          <input type="text" class="form-control" id="telephone" name="telephone">
+        </div>
+        
+        <div class="mb-3">
+          <label for="email" class="form-label">Email *</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        
+        <div class="mb-3">
+          <label for="mot_de_passe" class="form-label">Mot de passe *</label>
+          <input type="password" class="form-control" id="mot_de_passe" name="mot_de_passe" required>
+        </div>
+        
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary" id="register-btn">S'inscrire</button>
+        </div>
+        
+        <div class="text-center mt-3">
+          <p>Vous avez déjà un compte ? <a href="connexion.php">Connectez-vous</a></p>
+        </div>
+      </form>
+    <?php endif; ?>
+</div>
 
 <?php require_once '../includes/footer.php'; ?>
